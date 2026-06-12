@@ -242,7 +242,7 @@ value: "excellent"(≤2.5), "good"(2.5-3.2), "fair"(3.2-4.5), "overpriced"(>4.5)
       if (!jsonMatch) { renderError('Réponse inattendue : ' + text.substring(0, 200)); return; }
       const parsed = JSON.parse(jsonMatch[0]);
 
-      if (parsed.warning) { renderError(parsed.warning); }
+      if (parsed.warning) { renderError("WARNING: " + parsed.warning + " | RAW: " + text.substring(0,300)); }
       else { renderResult(parsed); }
 
     } catch(e) {
