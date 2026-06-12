@@ -12,83 +12,115 @@
   <title>VinScan</title>
   <style>
     :root {
-      --teal: #0F6E56; --teal-light: #E1F5EE; --teal-dark: #085041;
-      --teal-mid: #1D9E75; --teal-pale: #5DCAA5;
-      --red: #E24B4A; --red-light: #FCEBEB; --red-dark: #A32D2D;
-      --amber: #EF9F27; --amber-light: #FAEEDA; --amber-dark: #854F0B;
-      --gray-100: #f5f5f4; --gray-200: #e7e5e4; --gray-400: #a8a29e;
-      --gray-600: #57534e; --gray-800: #292524; --white: #ffffff;
-      --radius: 14px; --radius-sm: 8px;
+      --teal:#0F6E56;--teal-light:#E1F5EE;--teal-dark:#085041;--teal-mid:#1D9E75;--teal-pale:#5DCAA5;
+      --red:#E24B4A;--red-light:#FCEBEB;--red-dark:#A32D2D;
+      --amber:#EF9F27;--amber-light:#FAEEDA;--amber-dark:#854F0B;
+      --gray-100:#f5f5f4;--gray-200:#e7e5e4;--gray-400:#a8a29e;--gray-600:#57534e;--gray-800:#292524;
+      --white:#ffffff;--radius:14px;--radius-sm:8px;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    html, body { height: 100%; overflow: hidden; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif; background: var(--gray-100); color: var(--gray-800); height: 100vh; display: flex; flex-direction: column; }
-    .app { display: flex; flex-direction: column; height: 100%; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
-    .header { background: var(--teal-dark); padding: 14px 20px 16px; display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
-    .header-icon { width: 38px; height: 38px; background: rgba(255,255,255,0.15); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
-    .header h1 { font-size: 19px; font-weight: 600; color: #fff; letter-spacing: -0.3px; }
-    .header p { font-size: 12px; color: rgba(255,255,255,0.65); margin-top: 1px; }
-    .content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-    .screen { display: none; padding: 20px 16px; }
-    .screen.active { display: block; }
-    .upload-area { background: var(--white); border: 2px dashed var(--gray-200); border-radius: var(--radius); padding: 48px 20px; text-align: center; cursor: pointer; margin-bottom: 16px; }
-    .upload-area:active { background: var(--teal-light); }
-    .upload-area input { display: none; }
-    .upload-icon { width: 72px; height: 72px; background: var(--teal-light); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 32px; }
-    .upload-area h2 { font-size: 18px; font-weight: 600; margin-bottom: 6px; }
-    .upload-area p { font-size: 14px; color: var(--gray-400); line-height: 1.5; }
-    .tip-card { background: var(--white); border-radius: var(--radius); padding: 14px 16px; display: flex; align-items: flex-start; gap: 12px; }
-    .tip-icon { font-size: 22px; flex-shrink: 0; }
-    .tip-card h3 { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
-    .tip-card p { font-size: 12px; color: var(--gray-400); line-height: 1.5; }
-    .preview-img-wrap { border-radius: var(--radius); overflow: hidden; margin-bottom: 16px; background: var(--gray-200); position: relative; }
-    .preview-img-wrap img { width: 100%; max-height: 50vh; object-fit: cover; display: block; }
-    .change-photo { position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.55); color: #fff; border: none; border-radius: 20px; padding: 6px 14px; font-size: 13px; font-family: inherit; cursor: pointer; }
-    .btn-primary { width: 100%; background: var(--teal-dark); color: #fff; border: none; border-radius: var(--radius); padding: 16px; font-size: 17px; font-weight: 600; font-family: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
-    .btn-primary:active { opacity: 0.8; }
-    .loading-screen { display: flex; flex-direction: column; align-items: center; padding: 60px 24px; }
-    .wine-spinner { width: 64px; height: 64px; background: var(--teal-light); border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 30px; margin-bottom: 24px; animation: pulse 1.5s ease-in-out infinite; }
-    @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
-    .loading-screen h2 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
-    .loading-step { font-size: 14px; color: var(--gray-400); text-align: center; min-height: 20px; }
-    .progress-bar-bg { width: 100%; height: 4px; background: var(--gray-200); border-radius: 99px; margin-top: 24px; overflow: hidden; }
-    .progress-bar-fill { height: 100%; background: var(--teal-mid); border-radius: 99px; width: 0%; transition: width 0.6s ease; }
-    .best-pick-card { background: var(--teal-dark); border-radius: var(--radius); padding: 18px 20px; margin-bottom: 20px; color: #fff; }
-    .bp-eyebrow { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--teal-pale); margin-bottom: 8px; }
-    .bp-name { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 4px; }
-    .bp-price { font-size: 14px; color: rgba(255,255,255,0.65); margin-bottom: 12px; }
-    .bp-coeff { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.12); border-radius: 20px; padding: 5px 12px; font-size: 13px; color: rgba(255,255,255,0.9); margin-bottom: 12px; }
-    .bp-reason { font-size: 14px; color: rgba(255,255,255,0.8); line-height: 1.6; border-top: 1px solid rgba(255,255,255,0.12); padding-top: 12px; }
-    .section-title { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gray-400); margin-bottom: 10px; }
-    .wine-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
-    .wine-row { background: var(--white); border-radius: var(--radius-sm); padding: 12px 14px; border-left: 3px solid transparent; }
-    .wine-row.excellent, .wine-row.good { border-left-color: var(--teal-mid); }
-    .wine-row.fair { border-left-color: var(--amber); }
-    .wine-row.overpriced { border-left-color: var(--red); }
-    .wr-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
-    .wr-name { font-size: 14px; font-weight: 600; flex: 1; line-height: 1.3; }
-    .wr-price { font-size: 15px; font-weight: 600; white-space: nowrap; }
-    .wr-meta { font-size: 12px; color: var(--gray-400); margin-top: 2px; margin-bottom: 8px; }
-    .wr-bottom { display: flex; justify-content: space-between; align-items: center; }
-    .badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; }
-    .badge.good, .badge.excellent { background: var(--teal-light); color: var(--teal); }
-    .badge.fair { background: var(--amber-light); color: var(--amber-dark); }
-    .badge.overpriced { background: var(--red-light); color: var(--red-dark); }
-    .wr-coeff { font-size: 12px; color: var(--gray-400); }
-    .wr-coeff b { color: var(--gray-600); }
-    .wr-highlight { font-size: 11px; font-weight: 600; color: var(--teal); background: var(--teal-light); border-radius: 6px; padding: 2px 8px; display: inline-block; margin-bottom: 6px; }
-    .bp-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
-    .bp-tag { font-size: 12px; background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.9); border-radius: 20px; padding: 3px 10px; }
-    .wr-bar-bg { height: 3px; background: var(--gray-100); border-radius: 99px; overflow: hidden; margin-bottom: 8px; }
-    .wr-bar-fill { height: 100%; border-radius: 99px; }
-    .verdict-card { background: var(--white); border-radius: var(--radius); padding: 16px; margin-bottom: 20px; }
-    .verdict-card h3 { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
-    .verdict-card p { font-size: 14px; color: var(--gray-600); line-height: 1.6; }
-    .btn-secondary { width: 100%; background: var(--white); color: var(--teal-dark); border: 1.5px solid var(--teal-pale); border-radius: var(--radius); padding: 15px; font-size: 16px; font-weight: 600; font-family: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 12px; }
-    .error-card { background: var(--red-light); border-radius: var(--radius); padding: 24px 20px; text-align: center; margin-bottom: 16px; }
-    .error-card .err-icon { font-size: 36px; margin-bottom: 10px; }
-    .error-card h2 { font-size: 17px; font-weight: 600; color: var(--red-dark); margin-bottom: 6px; }
-    .error-card p { font-size: 13px; color: var(--red-dark); opacity: 0.8; line-height: 1.5; word-break: break-word; }
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+    html,body{height:100%;overflow:hidden;}
+    body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;background:var(--gray-100);color:var(--gray-800);height:100vh;display:flex;flex-direction:column;}
+    .app{display:flex;flex-direction:column;height:100%;padding-top:env(safe-area-inset-top);}
+    .header{background:var(--teal-dark);padding:14px 20px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0;}
+    .header-icon{width:38px;height:38px;background:rgba(255,255,255,0.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;}
+    .header h1{font-size:19px;font-weight:600;color:#fff;letter-spacing:-0.3px;}
+    .header p{font-size:12px;color:rgba(255,255,255,0.65);margin-top:1px;}
+    .content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(env(safe-area-inset-bottom) + 100px);}
+    .screen{display:none;padding:20px 16px;}
+    .screen.active{display:block;}
+
+    /* Upload */
+    .upload-area{background:var(--white);border:2px dashed var(--gray-200);border-radius:var(--radius);padding:48px 20px;text-align:center;cursor:pointer;margin-bottom:16px;}
+    .upload-area:active{background:var(--teal-light);}
+    .upload-area input{display:none;}
+    .upload-icon{width:72px;height:72px;background:var(--teal-light);border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:32px;}
+    .upload-area h2{font-size:18px;font-weight:600;margin-bottom:6px;}
+    .upload-area p{font-size:14px;color:var(--gray-400);line-height:1.5;}
+    .tip-card{background:var(--white);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:flex-start;gap:12px;}
+    .tip-icon{font-size:22px;flex-shrink:0;}
+    .tip-card h3{font-size:13px;font-weight:600;margin-bottom:3px;}
+    .tip-card p{font-size:12px;color:var(--gray-400);line-height:1.5;}
+
+    /* Preview */
+    .preview-img-wrap{border-radius:var(--radius);overflow:hidden;margin-bottom:16px;background:var(--gray-200);position:relative;}
+    .preview-img-wrap img{width:100%;max-height:50vh;object-fit:cover;display:block;}
+    .change-photo{position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,0.55);color:#fff;border:none;border-radius:20px;padding:6px 14px;font-size:13px;font-family:inherit;cursor:pointer;}
+
+    /* Buttons */
+    .btn-primary{width:100%;background:var(--teal-dark);color:#fff;border:none;border-radius:var(--radius);padding:16px;font-size:17px;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
+    .btn-primary:active{opacity:0.8;}
+    .btn-secondary{width:100%;background:var(--white);color:var(--teal-dark);border:1.5px solid var(--teal-pale);border-radius:var(--radius);padding:15px;font-size:16px;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px;}
+    .btn-secondary:active{background:var(--teal-light);}
+
+    /* Loading */
+    .loading-screen{display:flex;flex-direction:column;align-items:center;padding:60px 24px;}
+    .wine-spinner{width:64px;height:64px;background:var(--teal-light);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:30px;margin-bottom:24px;animation:pulse 1.5s ease-in-out infinite;}
+    @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+    .loading-screen h2{font-size:18px;font-weight:600;margin-bottom:8px;}
+    .loading-step{font-size:14px;color:var(--gray-400);text-align:center;min-height:20px;}
+    .progress-bar-bg{width:100%;height:4px;background:var(--gray-200);border-radius:99px;margin-top:24px;overflow:hidden;}
+    .progress-bar-fill{height:100%;background:var(--teal-mid);border-radius:99px;width:0%;transition:width 0.6s ease;}
+
+    /* Best pick */
+    .best-pick-card{background:var(--teal-dark);border-radius:var(--radius);padding:18px 20px;margin-bottom:20px;color:#fff;}
+    .bp-eyebrow{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--teal-pale);margin-bottom:8px;}
+    .bp-name{font-size:20px;font-weight:700;letter-spacing:-0.3px;margin-bottom:4px;}
+    .bp-price{font-size:14px;color:rgba(255,255,255,0.65);margin-bottom:10px;}
+    .bp-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+    .bp-chip{font-size:12px;background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.9);border-radius:20px;padding:4px 10px;}
+    .bp-reason{font-size:14px;color:rgba(255,255,255,0.85);line-height:1.6;border-top:1px solid rgba(255,255,255,0.12);padding-top:12px;}
+
+    /* Section title */
+    .section-title{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400);margin-bottom:10px;}
+
+    /* Wine cards */
+    .wine-list{display:flex;flex-direction:column;gap:8px;margin-bottom:20px;}
+    .wine-row{background:var(--white);border-radius:var(--radius-sm);border-left:3px solid transparent;overflow:hidden;cursor:pointer;}
+    .wine-row.excellent,.wine-row.good{border-left-color:var(--teal-mid);}
+    .wine-row.fair{border-left-color:var(--amber);}
+    .wine-row.overpriced{border-left-color:var(--red);}
+    .wr-summary{padding:12px 14px;}
+    .wr-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+    .wr-name{font-size:14px;font-weight:600;flex:1;line-height:1.3;}
+    .wr-price{font-size:15px;font-weight:600;white-space:nowrap;}
+    .wr-meta{font-size:12px;color:var(--gray-400);margin-top:2px;margin-bottom:8px;}
+    .wr-bar-bg{height:3px;background:var(--gray-100);border-radius:99px;overflow:hidden;margin-bottom:8px;}
+    .wr-bar-fill{height:100%;border-radius:99px;}
+    .wr-bottom{display:flex;justify-content:space-between;align-items:center;}
+    .badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;}
+    .badge.good,.badge.excellent{background:var(--teal-light);color:var(--teal);}
+    .badge.fair{background:var(--amber-light);color:var(--amber-dark);}
+    .badge.overpriced{background:var(--red-light);color:var(--red-dark);}
+    .wr-coeff{font-size:12px;color:var(--gray-400);}
+    .wr-coeff b{color:var(--gray-600);}
+    .wr-chevron{font-size:12px;color:var(--gray-400);transition:transform 0.2s;}
+    .wine-row.open .wr-chevron{transform:rotate(180deg);}
+
+    /* Highlight tag */
+    .wr-highlight{display:inline-block;font-size:11px;font-weight:600;color:var(--teal);background:var(--teal-light);border-radius:6px;padding:2px 8px;margin-bottom:6px;}
+    .wr-highlight.warn{color:var(--amber-dark);background:var(--amber-light);}
+    .wr-highlight.bad{color:var(--red-dark);background:var(--red-light);}
+
+    /* Accordion detail */
+    .wr-detail{display:none;padding:0 14px 14px;border-top:1px solid var(--gray-100);}
+    .wine-row.open .wr-detail{display:block;}
+    .wr-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;margin-top:10px;}
+    .wr-detail-item{background:var(--gray-100);border-radius:8px;padding:8px 10px;}
+    .wr-detail-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:var(--gray-400);margin-bottom:2px;}
+    .wr-detail-value{font-size:13px;font-weight:500;color:var(--gray-800);}
+    .wr-detail-reason{font-size:13px;color:var(--gray-600);line-height:1.6;}
+
+    /* Verdict */
+    .verdict-card{background:var(--white);border-radius:var(--radius);padding:16px;margin-bottom:20px;}
+    .verdict-card h3{font-size:14px;font-weight:600;margin-bottom:8px;}
+    .verdict-card p{font-size:14px;color:var(--gray-600);line-height:1.6;}
+
+    /* Error */
+    .error-card{background:var(--red-light);border-radius:var(--radius);padding:24px 20px;text-align:center;margin-bottom:16px;}
+    .error-card .err-icon{font-size:36px;margin-bottom:10px;}
+    .error-card h2{font-size:17px;font-weight:600;color:var(--red-dark);margin-bottom:6px;}
+    .error-card p{font-size:13px;color:var(--red-dark);opacity:0.8;line-height:1.5;word-break:break-word;}
   </style>
 </head>
 <body>
@@ -113,6 +145,7 @@
         </div>
       </div>
     </div>
+
     <div class="screen" id="screen-preview">
       <div class="preview-img-wrap">
         <img id="previewImg" src="" alt="Carte des vins">
@@ -120,6 +153,7 @@
       </div>
       <button class="btn-primary" onclick="analyze()">✨ Analyser la carte</button>
     </div>
+
     <div class="screen" id="screen-loading">
       <div class="loading-screen">
         <div class="wine-spinner">🍷</div>
@@ -128,6 +162,7 @@
         <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressBar"></div></div>
       </div>
     </div>
+
     <div class="screen" id="screen-result"></div>
   </div>
 </div>
@@ -135,8 +170,7 @@
 <script>
 let imageDataUrl = '';
 let stepTimer = null, progressTimer = null;
-
-const steps = ['Compression de l\'image…','Lecture des vins et prix…','Estimation des prix commerce…','Calcul des coefficients…','Rédaction de la recommandation…'];
+const steps = ["Compression de l'image…","Lecture des vins et prix…","Estimation des prix commerce…","Calcul des coefficients…","Analyse millésimes et domaines…","Rédaction de la recommandation…"];
 
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 
@@ -169,8 +203,8 @@ function startLoading() {
   let si = 0, progress = 5;
   document.getElementById('loadingStep').textContent = steps[0];
   document.getElementById('progressBar').style.width = '5%';
-  stepTimer = setInterval(() => { si = (si+1)%steps.length; document.getElementById('loadingStep').textContent = steps[si]; }, 2500);
-  progressTimer = setInterval(() => { progress = Math.min(progress + Math.random()*6, 88); document.getElementById('progressBar').style.width = progress+'%'; }, 400);
+  stepTimer = setInterval(() => { si=(si+1)%steps.length; document.getElementById('loadingStep').textContent=steps[si]; }, 2200);
+  progressTimer = setInterval(() => { progress=Math.min(progress+Math.random()*5,88); document.getElementById('progressBar').style.width=progress+'%'; }, 400);
 }
 
 function stopLoading() {
@@ -178,15 +212,14 @@ function stopLoading() {
   document.getElementById('progressBar').style.width = '100%';
 }
 
-// Compress any image (including HEIC which canvas can decode on iOS) to JPEG
 function compressToJpeg(dataUrl, callback) {
   const img = new Image();
   img.onload = function() {
-    const MAX = 1024;
+    const MAX = 1600;
     let w = img.width, h = img.height;
     if (w > MAX || h > MAX) {
-      if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
-      else { w = Math.round(w * MAX / h); h = MAX; }
+      if (w > h) { h = Math.round(h*MAX/w); w = MAX; }
+      else { w = Math.round(w*MAX/h); h = MAX; }
     }
     const canvas = document.createElement('canvas');
     canvas.width = w; canvas.height = h;
@@ -194,11 +227,9 @@ function compressToJpeg(dataUrl, callback) {
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, w, h);
     ctx.drawImage(img, 0, 0, w, h);
-    const jpeg = canvas.toDataURL('image/jpeg', 0.82);
-    const b64 = jpeg.split(',')[1];
-    callback(b64);
+    callback(canvas.toDataURL('image/jpeg', 0.88).split(',')[1]);
   };
-  img.onerror = function() { callback(null); };
+  img.onerror = () => callback(null);
   img.src = dataUrl;
 }
 
@@ -207,56 +238,46 @@ async function analyze() {
   startLoading();
 
   compressToJpeg(imageDataUrl, async function(b64) {
-    if (!b64) { stopLoading(); renderError('Impossible de lire cette image. Essaie depuis la galerie.'); return; }
+    if (!b64) { stopLoading(); renderError('Impossible de lire cette image.'); return; }
 
-    const prompt = `Tu es un expert en vins et sommelier de haut niveau. Analyse cette photo de carte des vins avec une approche multicritères.
+    const prompt = `Tu es un expert en vins et sommelier. Analyse cette photo de carte des vins.
 
-Pour chaque vin lisible, extrais : nom, domaine, millésime, appellation, type (rouge/blanc/rosé/bulles/dessert), prix carte.
+Pour chaque vin lisible : nom, domaine, millésime, appellation, type (rouge/blanc/rosé/bulles/dessert), prix carte.
 
-Évalue chaque vin sur 4 critères :
+Évalue sur 4 critères :
+1. PRIX : Estime prix commerce. Coefficient = prix carte / prix commerce. <2.5=excellente affaire, 2.5-3.2=normal, 3.2-4.5=moyen, >4.5=trop cher.
+2. MILLÉSIME : qualité pour cette appellation. vintage_note: "excellent","bon","moyen","difficile","inconnu"
+3. DOMAINE : prestige producteur. domaine_note: "iconique","excellent","bon","correct","inconnu"  
+4. ORIGINALITÉ : appellations sous-cotées = pépites. Signale-les dans highlight.
 
-1. RAPPORT QUALITÉ-PRIX : Estime le prix commerce (caviste/grande surface). Coefficient = prix carte / prix commerce. Norme : ×2.5-3.2 = normal, <×2.5 = excellente affaire, ×3.2-4.5 = moyen, >×4.5 = trop cher.
+Réponds UNIQUEMENT en JSON valide sans aucun texte avant ou après :
+{"best_pick":{"name":"Nom","year":"2019","type":"Rouge","price_menu":65,"price_retail_est":22,"coeff":2.9,"vintage_note":"bon","domaine_note":"excellent","reason":"3 phrases sur prix + millésime + domaine."},"wines":[{"name":"Nom","year":"2019","type":"Rouge","price_menu":65,"price_retail_est":22,"coeff":2.9,"value":"good","vintage_note":"bon","domaine_note":"correct","highlight":"","detail":"2 phrases descriptif du vin, accord mets suggéré."}],"verdict":"2-3 phrases : pièges à éviter et belles découvertes.","warning":null}
 
-2. MILLÉSIME : Évalue la qualité du millésime pour cette appellation. Ex: 2015/2018/2019 excellents en Bourgogne. Note: "excellent", "bon", "moyen", "difficile", "inconnu".
-
-3. RÉPUTATION DU DOMAINE : Évalue le prestige et la qualité du producteur. Note: "iconique", "excellent", "bon", "correct", "inconnu".
-
-4. ORIGINALITÉ : Les appellations sous-cotées (Faugères, Marcillac, Jurançon, Jura, Loire) offrent souvent un meilleur rapport que les classiques surcotés. Signale les belles découvertes.
-
-Le score global combine ces 4 critères. Un vin avec bon coefficient ET bon millésime ET bon domaine est le vrai gagnant.
-
-Réponds UNIQUEMENT avec du JSON valide, rien d'autre, pas de texte avant ou après :
-{"best_pick":{"name":"Nom","year":"2019","type":"Rouge","price_menu":65,"price_retail_est":22,"coeff":2.9,"vintage_note":"bon","domaine_note":"excellent","reason":"Explication multicritères en 3 phrases."},"wines":[{"name":"Nom","year":"2019","type":"Rouge","price_menu":65,"price_retail_est":22,"coeff":2.9,"value":"good","vintage_note":"bon","domaine_note":"correct","highlight":""}],"verdict":"Commentaire général 2-3 phrases avec pièges à éviter et belles découvertes.","warning":null}
-
-value: "excellent"(≤2.5), "good"(2.5-3.2), "fair"(3.2-4.5), "overpriced"(>4.5). highlight: courte note si vin remarquable (ex: "Millésime exceptionnel", "Pépite méconnue", "Domaine surestimé"). Trie du meilleur score global au pire. Si illisible, mets warning et wines:[].`;
+value: "excellent"(≤2.5),"good"(2.5-3.2),"fair"(3.2-4.5),"overpriced"(>4.5). Trie du meilleur score global au pire. Si illisible: warning + wines:[].`;
 
     try {
       const resp = await fetch('/api/analyze', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {'Content-Type':'application/json'},
         body: JSON.stringify({
           model: 'claude-sonnet-4-6',
-          max_tokens: 1500,
-          messages: [{ role: 'user', content: [
-            { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: b64 } },
-            { type: 'text', text: prompt }
+          max_tokens: 4000,
+          messages: [{role:'user',content:[
+            {type:'image',source:{type:'base64',media_type:'image/jpeg',data:b64}},
+            {type:'text',text:prompt}
           ]}]
         })
       });
 
       stopLoading();
       const data = await resp.json();
-
-      if (data.error) { renderError('Erreur API : ' + (data.error.message || JSON.stringify(data.error))); return; }
-
-      const text = data.content?.find(b => b.type === 'text')?.text || '';
+      if (data.error) { renderError('Erreur API : ' + (data.error.message||JSON.stringify(data.error))); return; }
+      const text = data.content?.find(b=>b.type==='text')?.text || '';
       const jsonMatch = text.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) { renderError('Réponse inattendue : ' + text.substring(0, 200)); return; }
+      if (!jsonMatch) { renderError('Réponse inattendue : ' + text.substring(0,200)); return; }
       const parsed = JSON.parse(jsonMatch[0]);
-
-      if (parsed.warning) { renderError(parsed.warning); }
-      else { renderResult(parsed); }
-
+      if (parsed.warning) renderError(parsed.warning);
+      else renderResult(parsed);
     } catch(e) {
       stopLoading();
       renderError('Erreur: ' + e.message);
@@ -265,64 +286,98 @@ value: "excellent"(≤2.5), "good"(2.5-3.2), "fair"(3.2-4.5), "overpriced"(>4.5)
 }
 
 function valueLabel(v) {
-  if (v === 'excellent') return { text: '⭐ Excellente affaire', cls: 'excellent' };
-  if (v === 'good')      return { text: '👍 Bon rapport', cls: 'good' };
-  if (v === 'fair')      return { text: '〜 Rapport moyen', cls: 'fair' };
-  return { text: '⚠️ Trop cher', cls: 'overpriced' };
+  if (v==='excellent') return {text:'⭐ Excellente affaire',cls:'excellent'};
+  if (v==='good')      return {text:'👍 Bon rapport',cls:'good'};
+  if (v==='fair')      return {text:'〜 Rapport moyen',cls:'fair'};
+  return {text:'⚠️ Trop cher',cls:'overpriced'};
 }
 function barColor(v) {
   if (v==='excellent'||v==='good') return '#1D9E75';
   if (v==='fair') return '#EF9F27';
   return '#E24B4A';
 }
-function barWidth(c) { return Math.round(Math.max(5, Math.min(100, (1-c/8)*100))); }
+function barWidth(c) { return Math.round(Math.max(5,Math.min(100,(1-c/8)*100))); }
 
-function vintageIcon(n) {
-  if (n==='excellent') return '⭐';
-  if (n==='bon') return '👍';
-  if (n==='moyen') return '〜';
-  if (n==='difficile') return '⚠️';
+function vintageChip(n) {
+  const map = {excellent:'⭐ Millésime excellent',bon:'👍 Millésime bon',moyen:'〜 Millésime moyen',difficile:'⚠️ Millésime difficile'};
+  return map[n] || '';
+}
+function domaineChip(n) {
+  const map = {iconique:'🏛️ Domaine iconique',excellent:'⭐ Domaine excellent',bon:'👍 Domaine reconnu'};
+  return map[n] || '';
+}
+function highlightClass(h) {
+  if (!h) return '';
+  const lc = h.toLowerCase();
+  if (lc.includes('surestimé')||lc.includes('éviter')||lc.includes('cher')) return 'bad';
+  if (lc.includes('moyen')||lc.includes('attention')) return 'warn';
   return '';
 }
-function domaineIcon(n) {
-  if (n==='iconique') return '🏛️';
-  if (n==='excellent') return '⭐';
-  if (n==='bon') return '👍';
-  return '';
+
+function toggleWine(el) {
+  el.classList.toggle('open');
 }
 
 function renderResult(data) {
   const bp = data.best_pick, wines = data.wines || [];
   let html = '';
+
   if (bp) {
-    const vi = vintageIcon(bp.vintage_note), di = domaineIcon(bp.domaine_note);
+    const vc = vintageChip(bp.vintage_note), dc = domaineChip(bp.domaine_note);
     html += `<div class="best-pick-card">
       <div class="bp-eyebrow">🏆 Meilleur choix ce soir</div>
       <div class="bp-name">${bp.name}${bp.year?' '+bp.year:''}</div>
-      <div class="bp-price">${bp.type||''} · ${bp.price_menu?bp.price_menu+'€ sur la carte':''}</div>
-      <div class="bp-coeff">×${bp.coeff?bp.coeff.toFixed(1):'?'} vs commerce${bp.price_retail_est?' · ~'+bp.price_retail_est+'€ caviste':''}</div>
-      ${vi||di ? '<div class="bp-tags">'+(vi?'<span class="bp-tag">'+vi+' Millésime '+bp.vintage_note+'</span>':'')+(di?'<span class="bp-tag">'+di+' Domaine '+bp.domaine_note+'</span>':'')+'</div>' : ''}
+      <div class="bp-price">${bp.type||''} · ${bp.price_menu?bp.price_menu+'€ sur la carte':''} · ~${bp.price_retail_est||'?'}€ caviste</div>
+      <div class="bp-chips">
+        <span class="bp-chip">×${bp.coeff?bp.coeff.toFixed(1):'?'} vs commerce</span>
+        ${vc?'<span class="bp-chip">'+vc+'</span>':''}
+        ${dc?'<span class="bp-chip">'+dc+'</span>':''}
+      </div>
       <div class="bp-reason">${bp.reason}</div>
     </div>`;
   }
+
   if (wines.length) {
-    html += `<div class="section-title">Tous les vins analysés</div><div class="wine-list">`;
-    wines.forEach(w => {
+    html += `<div class="section-title">Tous les vins · appuyer pour détails</div><div class="wine-list">`;
+    wines.forEach((w,i) => {
       const lbl = valueLabel(w.value), color = barColor(w.value), bw = barWidth(w.coeff||3);
-      const vi = vintageIcon(w.vintage_note);
-      html += `<div class="wine-row ${w.value}">
-        <div class="wr-top"><div><div class="wr-name">${w.name}</div>
-        <div class="wr-meta">${w.type||''}${w.year?' · '+w.year:''}${vi?' · '+vi+' '+w.vintage_note:''}</div></div>
-        <div class="wr-price">${w.price_menu?w.price_menu+'€':'—'}</div></div>
-        ${w.highlight?'<div class="wr-highlight">'+w.highlight+'</div>':''}
-        <div class="wr-bar-bg"><div class="wr-bar-fill" style="width:${bw}%;background:${color}"></div></div>
-        <div class="wr-bottom"><span class="badge ${lbl.cls}">${lbl.text}</span>
-        <span class="wr-coeff">×<b>${w.coeff?w.coeff.toFixed(1):'?'}</b>${w.price_retail_est?' · ~'+w.price_retail_est+'€':''}</span></div>
+      const vc = vintageChip(w.vintage_note), dc = domaineChip(w.domaine_note);
+      const hlCls = highlightClass(w.highlight||'');
+      html += `<div class="wine-row ${w.value}" onclick="toggleWine(this)">
+        <div class="wr-summary">
+          <div class="wr-top">
+            <div>
+              <div class="wr-name">${w.name}</div>
+              <div class="wr-meta">${w.type||''}${w.year?' · '+w.year:''}${w.vintage_note&&w.vintage_note!=='inconnu'?' · '+w.vintage_note+' millésime':''}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="wr-price">${w.price_menu?w.price_menu+'€':'—'}</div>
+              <span class="wr-chevron">▾</span>
+            </div>
+          </div>
+          ${w.highlight?'<div class="wr-highlight '+hlCls+'">'+w.highlight+'</div>':''}
+          <div class="wr-bar-bg"><div class="wr-bar-fill" style="width:${bw}%;background:${color}"></div></div>
+          <div class="wr-bottom">
+            <span class="badge ${lbl.cls}">${lbl.text}</span>
+            <span class="wr-coeff">×<b>${w.coeff?w.coeff.toFixed(1):'?'}</b>${w.price_retail_est?' · ~'+w.price_retail_est+'€':''}</span>
+          </div>
+        </div>
+        <div class="wr-detail">
+          <div class="wr-detail-grid">
+            <div class="wr-detail-item"><div class="wr-detail-label">Prix carte</div><div class="wr-detail-value">${w.price_menu?w.price_menu+'€':'—'}</div></div>
+            <div class="wr-detail-item"><div class="wr-detail-label">Prix commerce</div><div class="wr-detail-value">~${w.price_retail_est||'?'}€</div></div>
+            <div class="wr-detail-item"><div class="wr-detail-label">Coefficient</div><div class="wr-detail-value" style="color:${color}">×${w.coeff?w.coeff.toFixed(1):'?'}</div></div>
+            <div class="wr-detail-item"><div class="wr-detail-label">Millésime</div><div class="wr-detail-value">${w.vintage_note||'—'}</div></div>
+          </div>
+          ${vc||dc?'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">'+(vc?'<span style="font-size:12px;background:var(--teal-light);color:var(--teal);border-radius:20px;padding:3px 10px">'+vc+'</span>':'')+(dc?'<span style="font-size:12px;background:var(--teal-light);color:var(--teal);border-radius:20px;padding:3px 10px">'+dc+'</span>':'')+'</div>':''}
+          ${w.detail?'<div class="wr-detail-reason">'+w.detail+'</div>':''}
+        </div>
       </div>`;
     });
     html += `</div>`;
   }
-  if (data.verdict) html += `<div class="verdict-card"><h3>📋 Verdict</h3><p>${data.verdict}</p></div>`;
+
+  if (data.verdict) html += `<div class="verdict-card"><h3>📋 Verdict de la carte</h3><p>${data.verdict}</p></div>`;
   html += `<button class="btn-secondary" onclick="resetToUpload()">📷 Analyser une autre carte</button>`;
   document.getElementById('screen-result').innerHTML = html;
   showScreen('screen-result');
