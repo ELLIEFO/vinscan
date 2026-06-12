@@ -501,7 +501,7 @@ value : "excellent" (≤2.5), "good" (2.5-3.2), "fair" (3.2-4.5), "overpriced" (
 Trie wines du meilleur au moins bon rapport. Si aucun vin lisible, mettre warning avec le message d'erreur.`;
 
   try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    const resp = await fetch('/api/analyze', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -510,7 +510,7 @@ Trie wines du meilleur au moins bon rapport. Si aucun vin lisible, mettre warnin
         messages: [{
           role: 'user',
           content: [
-            { type: 'image', source: { type: 'base64', media_type: imageType, data: imageBase64 } },
+            { type: "image", source: { type: "base64", media_type: "image/jpeg", data: imageBase64 } },
             { type: 'text', text: prompt }
           ]
         }]
