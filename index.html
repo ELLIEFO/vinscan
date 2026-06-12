@@ -501,7 +501,7 @@ value : "excellent" (≤2.5), "good" (2.5-3.2), "fair" (3.2-4.5), "overpriced" (
 Trie wines du meilleur au moins bon rapport. Si aucun vin lisible, mettre warning avec le message d'erreur.`;
 
   try {
-    const resp = await fetch('/api/analyze', {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -520,7 +520,8 @@ Trie wines du meilleur au moins bon rapport. Si aucun vin lisible, mettre warnin
     stopLoading();
     const data = await resp.json();
     const text = data.content?.find(b => b.type === 'text')?.text || '';
-    const clean = text.replace(/```json|```/g, '').trim();
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    const clean = jsonMatch ? jsonMatch[0] : text.replace(/```json|```/g, '').trim();
     const parsed = JSON.parse(clean);
 
     if (parsed.warning) {
@@ -530,7 +531,7 @@ Trie wines du meilleur au moins bon rapport. Si aucun vin lisible, mettre warnin
     }
   } catch(e) {
     stopLoading();
-    renderError("Impossible d'analyser cette image. Assure-toi que la carte est bien lisible et réessaie.");
+    renderError("Analyse impossible. Vérifie que la carte est bien éclairée et réessaie. Détail: " + e.message);
   }
 }
 
