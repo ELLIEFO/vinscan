@@ -253,7 +253,7 @@ Pour chaque vin lisible : nom, domaine, millésime, appellation, type (rouge/bla
 Réponds UNIQUEMENT en JSON valide sans aucun texte avant ou après :
 {"best_pick":{"name":"Nom","year":"2019","type":"Rouge","price_menu":65,"price_retail_est":22,"coeff":2.9,"vintage_note":"bon","domaine_note":"excellent","reason":"3 phrases sur prix + millésime + domaine."},"wines":[{"name":"Nom","year":"2019","type":"Rouge","price_menu":65,"price_retail_est":22,"coeff":2.9,"value":"good","vintage_note":"bon","domaine_note":"correct","highlight":"","detail":"2 phrases descriptif du vin, accord mets suggéré."}],"verdict":"2-3 phrases : pièges à éviter et belles découvertes.","warning":null}
 
-value: "excellent"(≤2.5),"good"(2.5-3.2),"fair"(3.2-4.5),"overpriced"(>4.5). Trie du meilleur score global au pire. Si illisible: warning + wines:[].`;
+value: "excellent"(≤2.5),"good"(2.5-3.2),"fair"(3.2-4.5),"overpriced"(>4.5). Trie du meilleur score global au pire. N'utilise warning QUE si la photo est vraiment illisible. Si tu vois des anomalies de prix ou des doutes, mets-les dans le champ highlight ou verdict — mais fais toujours l'analyse complète avec wines[].`;
 
     try {
       const resp = await fetch('/api/analyze', {
