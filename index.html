@@ -624,3 +624,9 @@ function renderError(msg) {
 </script>
 </body>
 </html>
+<!-- debug -->
+<script>
+window.onerror = function(msg, src, line) {
+  alert('ERREUR: ' + msg + ' (ligne ' + line + ')');
+};
+</script>
