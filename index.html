@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="VinScan">
+  <meta name="theme-color" content="#085041">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <title>VinScan — Meilleur rapport qualité-prix</title>
+  <style>
+    :root {
+      --teal: #0F6E56;
+      --teal-light: #E1F5EE;
+      --teal-dark: #085041;
+      --teal-mid: #1D9E75;
+      --teal-pale: #5DCAA5;
+      --red: #E24B4A;
+      --red-light: #FCEBEB;
+      --red-dark: #A32D2D;
+      --amber: #EF9F27;
+      --amber-light: #FAEEDA;
+      --amber-dark: #854F0B;
+      --gray-100: #f5f5f4;
+      --gray-200: #e7e5e4;
+      --gray-400: #a8a29e;
+      --gray-600: #57534e;
+      --gray-800: #292524;
+      --white: #ffffff;
+      --radius: 14px;
+      --radius-sm: 8px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; overflow: hidden; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+      background: var(--gray-100);
+      color: var(--gray-800);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Status bar safe area */
+    .app {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    /* Header */
+    .header {
+      background: var(--teal-dark);
+      padding: 14px 20px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .header-icon {
+      width: 38px; height: 38px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+    }
+    .header h1 { font-size: 19px; font-weight: 600; color: #fff; letter-spacing: -0.3px; }
+    .header p { font-size: 12px; color: rgba(255,255,255,0.65); margin-top: 1px; }
+
+    /* Scrollable content */
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Screens */
+    .screen { display: none; padding: 20px 16px; }
+    .screen.active { display: block; }
+
+    /* ── UPLOAD SCREEN ── */
+    .upload-area {
+      background: var(--white);
+      border: 2px dashed var(--gray-200);
+      border-radius: var(--radius);
+      padding: 48px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      -webkit-user-select: none;
+      margin-bottom: 16px;
+    }
+    .upload-area:active { background: var(--teal-light); border-color: var(--teal-pale); }
+    .upload-area input { display: none; }
+    .upload-icon {
+      width: 72px; height: 72px;
+      background: var(--teal-light);
+      border-radius: 20px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px;
+      font-size: 32px;
+    }
+    .upload-area h2 { font-size: 18px; font-weight: 600; color: var(--gray-800); margin-bottom: 6px; }
+    .upload-area p { font-size: 14px; color: var(--gray-400); line-height: 1.5; }
+
+    .tip-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .tip-icon { font-size: 22px; flex-shrink: 0; margin-top: 1px; }
+    .tip-card h3 { font-size: 13px; font-weight: 600; color: var(--gray-800); margin-bottom: 3px; }
+    .tip-card p { font-size: 12px; color: var(--gray-400); line-height: 1.5; }
+
+    /* ── PREVIEW SCREEN ── */
+    .preview-img-wrap {
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 16px;
+      background: var(--gray-200);
+      position: relative;
+    }
+    .preview-img-wrap img {
+      width: 100%;
+      max-height: 50vh;
+      object-fit: cover;
+      display: block;
+    }
+    .change-photo {
+      position: absolute;
+      bottom: 10px; right: 10px;
+      background: rgba(0,0,0,0.55);
+      color: #fff;
+      border: none;
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 13px;
+      font-family: inherit;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+    }
+    .btn-primary {
+      width: 100%;
+      background: var(--teal-dark);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      padding: 16px;
+      font-size: 17px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: opacity 0.15s;
+    }
+    .btn-primary:active { opacity: 0.8; }
+    .btn-primary:disabled { opacity: 0.4; }
+
+    /* ── LOADING SCREEN ── */
+    .loading-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 60px 24px;
+    }
+    .wine-spinner {
+      width: 64px; height: 64px;
+      background: var(--teal-light);
+      border-radius: 18px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 30px;
+      margin-bottom: 24px;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.08);opacity:0.8} }
+    .loading-screen h2 { font-size: 18px; font-weight: 600; color: var(--gray-800); margin-bottom: 8px; }
+    .loading-step { font-size: 14px; color: var(--gray-400); text-align: center; min-height: 20px; transition: opacity 0.3s; }
+    .progress-bar-bg {
+      width: 100%;
+      height: 4px;
+      background: var(--gray-200);
+      border-radius: 99px;
+      margin-top: 24px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--teal-mid);
+      border-radius: 99px;
+      width: 0%;
+      transition: width 0.6s ease;
+    }
+
+    /* ── RESULT SCREEN ── */
+    .best-pick-card {
+      background: var(--teal-dark);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      margin-bottom: 20px;
+      color: #fff;
+    }
+    .bp-eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--teal-pale);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .bp-name { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 4px; }
+    .bp-price { font-size: 14px; color: rgba(255,255,255,0.65); margin-bottom: 12px; }
+    .bp-coeff {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.12);
+      border-radius: 20px;
+      padding: 5px 12px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.9);
+      margin-bottom: 12px;
+    }
+    .bp-reason {
+      font-size: 14px;
+      color: rgba(255,255,255,0.8);
+      line-height: 1.6;
+      border-top: 1px solid rgba(255,255,255,0.12);
+      padding-top: 12px;
+      margin-top: 4px;
+    }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--gray-400);
+      margin-bottom: 10px;
+    }
+
+    .wine-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+
+    .wine-row {
+      background: var(--white);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      border-left: 3px solid transparent;
+    }
+    .wine-row.excellent, .wine-row.good { border-left-color: var(--teal-mid); }
+    .wine-row.fair { border-left-color: var(--amber); }
+    .wine-row.overpriced { border-left-color: var(--red); }
+
+    .wr-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+    .wr-name { font-size: 14px; font-weight: 600; color: var(--gray-800); flex: 1; line-height: 1.3; }
+    .wr-price { font-size: 15px; font-weight: 600; color: var(--gray-800); white-space: nowrap; }
+    .wr-meta { font-size: 12px; color: var(--gray-400); margin-top: 2px; margin-bottom: 8px; }
+
+    .wr-bottom { display: flex; justify-content: space-between; align-items: center; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 20px;
+    }
+    .badge.good, .badge.excellent { background: var(--teal-light); color: var(--teal); }
+    .badge.fair { background: var(--amber-light); color: var(--amber-dark); }
+    .badge.overpriced { background: var(--red-light); color: var(--red-dark); }
+    .wr-coeff { font-size: 12px; color: var(--gray-400); }
+    .wr-coeff b { color: var(--gray-600); }
+
+    .wr-bar-bg { height: 3px; background: var(--gray-100); border-radius: 99px; overflow: hidden; margin-bottom: 8px; }
+    .wr-bar-fill { height: 100%; border-radius: 99px; }
+
+    .verdict-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+    .verdict-card h3 { font-size: 14px; font-weight: 600; color: var(--gray-800); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+    .verdict-card p { font-size: 14px; color: var(--gray-600); line-height: 1.6; }
+
+    .btn-secondary {
+      width: 100%;
+      background: var(--white);
+      color: var(--teal-dark);
+      border: 1.5px solid var(--teal-pale);
+      border-radius: var(--radius);
+      padding: 15px;
+      font-size: 16px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .btn-secondary:active { background: var(--teal-light); }
+
+    /* Error */
+    .error-card {
+      background: var(--red-light);
+      border-radius: var(--radius);
+      padding: 24px 20px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    .error-card .err-icon { font-size: 36px; margin-bottom: 10px; }
+    .error-card h2 { font-size: 17px; font-weight: 600; color: var(--red-dark); margin-bottom: 6px; }
+    .error-card p { font-size: 14px; color: var(--red-dark); opacity: 0.8; line-height: 1.5; }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="header-icon">🍷</div>
+    <div>
+      <h1>VinScan</h1>
+      <p>Meilleur rapport qualité-prix</p>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- SCREEN: Upload -->
+    <div class="screen active" id="screen-upload">
+      <label class="upload-area" for="fileInput">
+        <div class="upload-icon">📷</div>
+        <h2>Photographier la carte</h2>
+        <p>Prends une photo de la carte des vins ou importe une image depuis ta galerie</p>
+        <input type="file" id="fileInput" accept="image/*" capture="environment">
+      </label>
+
+      <div class="tip-card">
+        <div class="tip-icon">💡</div>
+        <div>
+          <h3>Pour un meilleur résultat</h3>
+          <p>Carte bien éclairée, à plat, tous les prix visibles. Si la carte fait plusieurs pages, analyse-les séparément.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN: Preview -->
+    <div class="screen" id="screen-preview">
+      <div class="preview-img-wrap">
+        <img id="previewImg" src="" alt="Carte des vins">
+        <button class="change-photo" onclick="resetToUpload()">✕ Changer</button>
+      </div>
+      <button class="btn-primary" id="analyzeBtn" onclick="analyze()">
+        ✨ Analyser la carte
+      </button>
+    </div>
+
+    <!-- SCREEN: Loading -->
+    <div class="screen" id="screen-loading">
+      <div class="loading-screen">
+        <div class="wine-spinner">🍷</div>
+        <h2>Analyse en cours…</h2>
+        <div class="loading-step" id="loadingStep">Lecture des vins et des prix…</div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="progressBar"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN: Result -->
+    <div class="screen" id="screen-result"></div>
+
+  </div>
+</div>
+
+<script>
+let imageBase64 = '';
+let imageType = 'image/jpeg';
+let stepTimer = null;
+let progressTimer = null;
+
+const steps = [
+  'Lecture des vins et des prix…',
+  'Estimation des prix du commerce…',
+  'Calcul des coefficients multiplicateurs…',
+  'Identification des meilleures affaires…',
+  'Rédaction de la recommandation…'
+];
+
+// Register service worker for PWA offline support
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+
+document.getElementById('fileInput').addEventListener('change', function() {
+  const file = this.files[0];
+  if (!file) return;
+  imageType = file.type || 'image/jpeg';
+  const reader = new FileReader();
+  reader.onload = e => {
+    imageBase64 = e.target.result.split(',')[1];
+    document.getElementById('previewImg').src = e.target.result;
+    showScreen('screen-preview');
+  };
+  reader.readAsDataURL(file);
+});
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelector('.content').scrollTop = 0;
+}
+
+function resetToUpload() {
+  imageBase64 = '';
+  document.getElementById('fileInput').value = '';
+  showScreen('screen-upload');
+}
+
+function startLoading() {
+  showScreen('screen-loading');
+  let si = 0;
+  let progress = 0;
+  document.getElementById('loadingStep').textContent = steps[0];
+  document.getElementById('progressBar').style.width = '5%';
+
+  stepTimer = setInterval(() => {
+    si = (si + 1) % steps.length;
+    document.getElementById('loadingStep').textContent = steps[si];
+  }, 2500);
+
+  progressTimer = setInterval(() => {
+    progress = Math.min(progress + Math.random() * 8, 88);
+    document.getElementById('progressBar').style.width = progress + '%';
+  }, 400);
+}
+
+function stopLoading() {
+  clearInterval(stepTimer);
+  clearInterval(progressTimer);
+  document.getElementById('progressBar').style.width = '100%';
+}
+
+async function analyze() {
+  if (!imageBase64) return;
+  startLoading();
+
+  const prompt = `Tu es un expert en vins et en tarification de restaurants. Analyse cette photo de carte des vins.
+
+Pour chaque vin lisible, extrais : nom, millésime, type (rouge/blanc/rosé/bulles/dessert), prix sur la carte.
+
+Ensuite, estime le prix commerce approximatif de chaque vin (ce qu'on paierait en caviste ou grande surface). Base-toi sur ta connaissance des appellations, domaines et millésimes.
+
+Calcule le coefficient multiplicateur (prix carte / prix commerce estimé).
+
+Norme du secteur : ×2.5 à ×3.2 = normal. En dessous de ×2.5 = excellente affaire. Entre ×3.2 et ×4.5 = rapport moyen. Au-delà de ×4.5 = trop cher.
+
+Réponds UNIQUEMENT en JSON valide, sans markdown, sans backticks :
+{
+  "best_pick": {
+    "name": "Nom du vin",
+    "year": "2019",
+    "type": "Rouge",
+    "price_menu": 65,
+    "price_retail_est": 22,
+    "coeff": 2.9,
+    "reason": "Explication courte en français pourquoi c'est le meilleur choix (2-3 phrases)"
+  },
+  "wines": [
+    {
+      "name": "Nom",
+      "year": "2019",
+      "type": "Rouge",
+      "price_menu": 65,
+      "price_retail_est": 22,
+      "coeff": 2.9,
+      "value": "good"
+    }
+  ],
+  "verdict": "Commentaire général sur la carte en 2-3 phrases.",
+  "warning": null
+}
+
+value : "excellent" (≤2.5), "good" (2.5-3.2), "fair" (3.2-4.5), "overpriced" (>4.5).
+Trie wines du meilleur au moins bon rapport. Si aucun vin lisible, mettre warning avec le message d'erreur.`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1500,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: imageType, data: imageBase64 } },
+            { type: 'text', text: prompt }
+          ]
+        }]
+      })
+    });
+
+    stopLoading();
+    const data = await resp.json();
+    const text = data.content?.find(b => b.type === 'text')?.text || '';
+    const clean = text.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+
+    if (parsed.warning) {
+      renderError(parsed.warning);
+    } else {
+      renderResult(parsed);
+    }
+  } catch(e) {
+    stopLoading();
+    renderError("Impossible d'analyser cette image. Assure-toi que la carte est bien lisible et réessaie.");
+  }
+}
+
+function valueLabel(v) {
+  if (v === 'excellent') return { text: '⭐ Excellente affaire', cls: 'excellent' };
+  if (v === 'good')      return { text: '👍 Bon rapport', cls: 'good' };
+  if (v === 'fair')      return { text: '〜 Rapport moyen', cls: 'fair' };
+  return { text: '⚠️ Trop cher', cls: 'overpriced' };
+}
+
+function barColor(v) {
+  if (v === 'excellent' || v === 'good') return '#1D9E75';
+  if (v === 'fair') return '#EF9F27';
+  return '#E24B4A';
+}
+
+function barWidth(coeff) {
+  return Math.round(Math.max(5, Math.min(100, (1 - coeff / 8) * 100)));
+}
+
+function renderResult(data) {
+  const bp = data.best_pick;
+  const wines = data.wines || [];
+  let html = '';
+
+  if (bp) {
+    html += `
+    <div class="best-pick-card">
+      <div class="bp-eyebrow">🏆 Meilleur choix ce soir</div>
+      <div class="bp-name">${bp.name}${bp.year ? ' ' + bp.year : ''}</div>
+      <div class="bp-price">${bp.type || ''} · ${bp.price_menu ? bp.price_menu + '€ sur la carte' : ''}</div>
+      <div class="bp-coeff">
+        ×${bp.coeff ? bp.coeff.toFixed(1) : '?'} vs commerce
+        ${bp.price_retail_est ? '· ~' + bp.price_retail_est + '€ en caviste' : ''}
+      </div>
+      <div class="bp-reason">${bp.reason}</div>
+    </div>`;
+  }
+
+  if (wines.length > 0) {
+    html += `<div class="section-title">Tous les vins analysés</div><div class="wine-list">`;
+    wines.forEach(w => {
+      const lbl = valueLabel(w.value);
+      const color = barColor(w.value);
+      const bw = barWidth(w.coeff || 3);
+      html += `
+      <div class="wine-row ${w.value}">
+        <div class="wr-top">
+          <div>
+            <div class="wr-name">${w.name}</div>
+            <div class="wr-meta">${w.type || ''}${w.year ? ' · ' + w.year : ''}</div>
+          </div>
+          <div class="wr-price">${w.price_menu ? w.price_menu + '€' : '—'}</div>
+        </div>
+        <div class="wr-bar-bg"><div class="wr-bar-fill" style="width:${bw}%;background:${color}"></div></div>
+        <div class="wr-bottom">
+          <span class="badge ${lbl.cls}">${lbl.text}</span>
+          <span class="wr-coeff">×<b>${w.coeff ? w.coeff.toFixed(1) : '?'}</b>${w.price_retail_est ? ' · ~' + w.price_retail_est + '€' : ''}</span>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  if (data.verdict) {
+    html += `
+    <div class="verdict-card">
+      <h3>📋 Verdict sur la carte</h3>
+      <p>${data.verdict}</p>
+    </div>`;
+  }
+
+  html += `
+  <button class="btn-secondary" onclick="resetToUpload()">📷 Analyser une autre carte</button>`;
+
+  document.getElementById('screen-result').innerHTML = html;
+  showScreen('screen-result');
+}
+
+function renderError(msg) {
+  document.getElementById('screen-result').innerHTML = `
+  <div class="error-card">
+    <div class="err-icon">📷</div>
+    <h2>Photo illisible</h2>
+    <p>${msg}</p>
+  </div>
+  <button class="btn-primary" onclick="resetToUpload()">Reprendre une photo</button>`;
+  showScreen('screen-result');
+}
+</script>
+</body>
+</html>
